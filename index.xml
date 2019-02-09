@@ -19,7 +19,7 @@
       <guid>https://dnz986.github.io/posts/2019-02-08-jq-upsert-cloudformation/</guid>
       <description>I&amp;rsquo;ve been trying recently to automate some cloudformation scripts. The parameters that are supplied to cloudformation can be all from the command line or all within a file, but not both. Hence I went for changing the file using jq. If you want to change any json from the command line then jq will be your friend.
 A typical cloudformation json will look like this:
-[ { &amp;quot;ParameterKey&amp;quot;: &amp;quot;KeyPairName&amp;quot;, &amp;quot;ParameterValue&amp;quot;: &amp;quot;MyKey&amp;quot; }, { &amp;quot;ParameterKey&amp;quot;: &amp;quot;InstanceType&amp;quot;, &amp;quot;ParameterValue&amp;quot;: &amp;quot;m1.</description>
+[ { &amp;#34;ParameterKey&amp;#34;: &amp;#34;KeyPairName&amp;#34;, &amp;#34;ParameterValue&amp;#34;: &amp;#34;MyKey&amp;#34; }, { &amp;#34;ParameterKey&amp;#34;: &amp;#34;InstanceType&amp;#34;, &amp;#34;ParameterValue&amp;#34;: &amp;#34;m1.</description>
     </item>
     
   </channel>

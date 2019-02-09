@@ -9,6 +9,7 @@
     <meta name="description" content="" />
     <base href="https://dnz986.github.io/" />
     <link rel="stylesheet" href="https://dnz986.github.io/css/main.min.3bf813d46763420c83fb33c51950b4fc582483efcfddb34b4e4e8d6b811e3208.css" />
+    <link rel="stylesheet" href="/static/css/style.css">
   </head>
   <body>
     <header class="app-header">
@@ -40,30 +41,24 @@ or all within a file, but not both. Hence I went for changing the file using <co
 be your friend.</p>
 
 <p>A typical cloudformation json will look like this:</p>
-
-<pre><code>[
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">[
   {
-    &quot;ParameterKey&quot;: &quot;KeyPairName&quot;,
-    &quot;ParameterValue&quot;: &quot;MyKey&quot;
+    <span style="color:#f92672">&#34;ParameterKey&#34;</span>: <span style="color:#e6db74">&#34;KeyPairName&#34;</span>,
+    <span style="color:#f92672">&#34;ParameterValue&#34;</span>: <span style="color:#e6db74">&#34;MyKey&#34;</span>
   }, 
   {
-    &quot;ParameterKey&quot;: &quot;InstanceType&quot;,
-    &quot;ParameterValue&quot;: &quot;m1.micro&quot;
+    <span style="color:#f92672">&#34;ParameterKey&#34;</span>: <span style="color:#e6db74">&#34;InstanceType&#34;</span>,
+    <span style="color:#f92672">&#34;ParameterValue&#34;</span>: <span style="color:#e6db74">&#34;m1.micro&#34;</span>
   }
-]
-</code></pre>
-
+]</code></pre></div>
 <p>Being lazy i went ahead and searched for a already available solution. After some googling around I have found this
 <a href="http://engineering.monsanto.com/2015/05/22/jq-change-json/">link</a>, which looked very promising at first sight.</p>
-
-<pre><code class="language-shell">function populate-config() { 
-  jq &quot;map(if .ParameterKey == \&quot;$1\&quot; 
-          then . + {\&quot;ParameterValue\&quot;:\&quot;$2\&quot;} 
-          else . 
-          end)&quot;
-}
-</code></pre>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#66d9ef">function</span> populate-config<span style="color:#f92672">()</span> <span style="color:#f92672">{</span> 
+  jq <span style="color:#e6db74">&#34;map(if .ParameterKey == \&#34;</span>$1<span style="color:#e6db74">\&#34; 
+</span><span style="color:#e6db74">          then . + {\&#34;ParameterValue\&#34;:\&#34;</span>$2<span style="color:#e6db74">\&#34;} 
+</span><span style="color:#e6db74">          else . 
+</span><span style="color:#e6db74">          end)&#34;</span>
+<span style="color:#f92672">}</span></code></pre></div>
 <p>I went ahead and fixed the quote escape on the $2 parameter in the above code and went on to test the function. Yay, it would overwrite
 any existing value that was already defined in my json. Problem is, sometimes I would like to add some parameters which are not defined.</p>
 
@@ -71,22 +66,16 @@ any existing value that was already defined in my json. Problem is, sometimes I 
 and if the key matches the first supplied paramter then it will update the value of the &ldquo;ParameterValue&rdquo; with the second parameter.</p>
 
 <p>I wanted to have it in a single function, so this is what I came up with</p>
-
-<pre><code class="language-shell">function upsert-config() { 
-  jq &quot;del(.[]|select(.ParameterKey == \&quot;$1\&quot;)) 
-      +[{\&quot;ParameterKey\&quot;: \&quot;$1\&quot;,\&quot;ParameterValue\&quot;:\&quot;MyKey\&quot;}]&quot;;
-}
-</code></pre>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#66d9ef">function</span> upsert-config<span style="color:#f92672">()</span> <span style="color:#f92672">{</span> 
+  jq <span style="color:#e6db74">&#34;del(.[]|select(.ParameterKey == \&#34;</span>$1<span style="color:#e6db74">\&#34;)) 
+</span><span style="color:#e6db74">      +[{\&#34;ParameterKey\&#34;: \&#34;</span>$1<span style="color:#e6db74">\&#34;,\&#34;ParameterValue\&#34;:\&#34;MyKey\&#34;}]&#34;</span>;
+<span style="color:#f92672">}</span></code></pre></div>
 <p>This is basically a delete and an insert. There is probably a better way to do this in <code>jq</code> but I do not know of any yet. This works for me now</p>
 
 <p>The nice thig about having this as a function is that you can update multiple variables using pipes in between:</p>
-
-<pre><code>cat config.json | 
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-PowerShell" data-lang="PowerShell">cat config.json | 
    upsert-config Version 1.0.10|
-   upsert-config MinSize 0 &gt; result.json
-</code></pre>
-
+   upsert-config MinSize 0 &gt; result.json</code></pre></div>
 <p>Ok, now back to my cloudformation scripts.</p>
 
     </div>
