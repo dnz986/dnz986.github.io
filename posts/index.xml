@@ -6,10 +6,20 @@
     <description>Recent content in Posts on dnz986 notes</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 08 Feb 2019 01:26:08 +0200</lastBuildDate>
+    <lastBuildDate>Thu, 14 Feb 2019 23:00:00 +0200</lastBuildDate>
     
 	<atom:link href="https://dnz986.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Clearing Up Domain Registry</title>
+      <link>https://dnz986.github.io/cleaning-up-domain-with-domain-registry/</link>
+      <pubDate>Thu, 14 Feb 2019 23:00:00 +0200</pubDate>
+      
+      <guid>https://dnz986.github.io/cleaning-up-domain-with-domain-registry/</guid>
+      <description>Some time ago I have found a blog which I enjoyed https://craftingingjava.com. I enjoyed the post about the domain registry context. It really cleans up the code, and the power of this I think, is that you can use the pattern in multiple languages, not just java. It is a generally valid way of doing dependency management.
+I would have the link in my bookmarks, and forward the link to new coleagues.</description>
+    </item>
     
     <item>
       <title>JQ Upsert Cloudformation</title>

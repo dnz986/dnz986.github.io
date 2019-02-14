@@ -1,0 +1,401 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Clearing Up Domain Registry // dnz986 notes</title>
+    <meta charset="utf-8" />
+    <meta name="generator" content="Hugo 0.53" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="dnz986" />
+    <meta name="description" content="" />
+    <base href="https://dnz986.github.io/" />
+    <link rel="stylesheet" href="https://dnz986.github.io/css/main.min.69eaa2ea72f096e96a4354a3affeb6587332ca518f7fa7cd3de60f6dbb548d57.css" />
+    <link rel="stylesheet" href="/static/css/style.css">
+  </head>
+  <body>
+    <header class="app-header">
+      <a href="/"><img class="app-header-avatar" src="./avatar.jpg" /></a>
+      <h1>dnz986 notes</h1>
+      <p>by night software developer, by day...also software developer</p>
+      <div class="app-header-social">
+        
+      </div>
+    </header>
+    <main class="app-container">
+      
+  <article class="post">
+    <header class="post-header">
+      <h1 class ="post-title">Clearing Up Domain Registry</h1>
+      <div class="post-meta">
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          Feb 14, 2019
+        </div>
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-clock"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          8 min read
+        </div></div>
+    </header>
+    <div class="post-content">
+      
+
+<p>Some time ago I have found a blog which I enjoyed <a href="https://craftingingjava.com">https://craftingingjava.com</a>. I enjoyed the post about
+the domain registry context. It really cleans up the code, and the power of this I think, is that you can use the
+pattern in multiple languages, not just java. It is a generally valid way of doing dependency management.</p>
+
+<p>I would have the link in my bookmarks, and forward the link to new coleagues. To my surprize I checked out the blog
+today, and got &lsquo;This domain is parked&rsquo; from wordpress. Probably his subscription has run out. Untill the site comes back
+up, I will paste the article here from the google cache, so that it doesn&rsquo;t get lost.</p>
+
+<hr />
+
+<h1 id="introduction">Introduction</h1>
+
+<p>I’ve recently read again excellent Implementing Domain Driven Design book by Vaughn Vernon. He presents there a lot of examples for domain objects, services and other components. I spotted a nice pattern that he uses for them – Domain Registry.</p>
+
+<p>I stared to use this pattern in my newest code task.
+I want to show you usecases and discuss about this alternative way to resolve dependencies…</p>
+
+<h1 id="what-is-domain-registry">What is Domain Registry</h1>
+
+<p>DomainRegistry in Mr Vernon book was introduced as object, which has access to domain services and repositories. Registry brings clean API to get these objects and invoke some operations on them in another domain objects.</p>
+
+<p>Let’s look at the example from Vernon code:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">DomainRegistry</span> <span style="color:#66d9ef">implements</span> ApplicationContextAware <span style="color:#f92672">{</span>
+
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> ApplicationContext applicationContext<span style="color:#f92672">;</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> AuthenticationService <span style="color:#a6e22e">authenticationService</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">return</span> <span style="color:#f92672">(</span>AuthenticationService<span style="color:#f92672">)</span> applicationContext<span style="color:#f92672">.</span><span style="color:#a6e22e">getBean</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;authenticationService&#34;</span><span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> AuthorizationService <span style="color:#a6e22e">authorizationService</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">return</span> <span style="color:#f92672">(</span>AuthorizationService<span style="color:#f92672">)</span> applicationContext<span style="color:#f92672">.</span><span style="color:#a6e22e">getBean</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;authorizationService&#34;</span><span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> EncryptionService <span style="color:#a6e22e">encryptionService</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">return</span> <span style="color:#f92672">(</span>EncryptionService<span style="color:#f92672">)</span> applicationContext<span style="color:#f92672">.</span><span style="color:#a6e22e">getBean</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;encryptionService&#34;</span><span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> GroupMemberService <span style="color:#a6e22e">groupMemberService</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">return</span> <span style="color:#f92672">(</span>GroupMemberService<span style="color:#f92672">)</span> applicationContext<span style="color:#f92672">.</span><span style="color:#a6e22e">getBean</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;groupMemberService&#34;</span><span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> UserRepository <span style="color:#a6e22e">userRepository</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">return</span> <span style="color:#f92672">(</span>UserRepository<span style="color:#f92672">)</span> applicationContext<span style="color:#f92672">.</span><span style="color:#a6e22e">getBean</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;userRepository&#34;</span><span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">synchronized</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setApplicationContext</span><span style="color:#f92672">(</span>
+            ApplicationContext anApplicationContext<span style="color:#f92672">)</span>
+    <span style="color:#66d9ef">throws</span> BeansException <span style="color:#f92672">{</span>
+
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>DomainRegistry<span style="color:#f92672">.</span><span style="color:#a6e22e">applicationContext</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            DomainRegistry<span style="color:#f92672">.</span><span style="color:#a6e22e">applicationContext</span> <span style="color:#f92672">=</span> anApplicationContext<span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span></code></pre></div>
+<p>As we can see, he implemented Springs’ ApplicationContextAware interface, and injected ApplicationContext (which holds every application Spring bean) into this implementation. There is not a lot of logic. Each method retrieves Spring bean from ApplicationContext.</p>
+
+<p>Example of DomainRegistry usage in Mr Vernon code:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">testAuthenticationTenantFailure</span><span style="color:#f92672">()</span> <span style="color:#66d9ef">throws</span> Exception <span style="color:#f92672">{</span>
+
+        User user <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">userAggregate</span><span style="color:#f92672">();</span>
+
+        DomainRegistry
+            <span style="color:#f92672">.</span><span style="color:#a6e22e">userRepository</span><span style="color:#f92672">()</span>
+            <span style="color:#f92672">.</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span>user<span style="color:#f92672">);</span>
+
+        UserDescriptor userDescriptor <span style="color:#f92672">=</span>
+            DomainRegistry
+                <span style="color:#f92672">.</span><span style="color:#a6e22e">authenticationService</span><span style="color:#f92672">()</span>
+                <span style="color:#f92672">.</span><span style="color:#a6e22e">authenticate</span><span style="color:#f92672">(</span>
+                        DomainRegistry<span style="color:#f92672">.</span><span style="color:#a6e22e">tenantRepository</span><span style="color:#f92672">().</span><span style="color:#a6e22e">nextIdentity</span><span style="color:#f92672">(),</span>
+                        user<span style="color:#f92672">.</span><span style="color:#a6e22e">username</span><span style="color:#f92672">(),</span>
+                        FIXTURE_PASSWORD<span style="color:#f92672">);</span>
+
+        assertNotNull<span style="color:#f92672">(</span>userDescriptor<span style="color:#f92672">);</span>
+        assertTrue<span style="color:#f92672">(</span>userDescriptor<span style="color:#f92672">.</span><span style="color:#a6e22e">isNullDescriptor</span><span style="color:#f92672">());</span>
+    <span style="color:#f92672">}</span></code></pre></div>
+<p>Here, in test DomainRegistry provides domain service (AuthenticationService) and repository (UserRepository) to other objects.</p>
+
+<h1 id="passing-dependencies-as-params">Passing dependencies as params</h1>
+
+<p>I found this pattern quite useful. I’ve been recently <a href="https://github.com/gerardszczepanski/tickets-reservation-system-task">working on code</a>
+trying to solve some problem. I’m creating web app with domain related to tickets reservations for many events.</p>
+
+<p>I have an aggregate called Reservation, which is created per User – represented by userId, and Event – represented by
+ eventId. Website sends a request to my application with create Reservation task with given userId and eventId.</p>
+
+<p>Reservation has its own static factory method for creation – called create.</p>
+
+<p>Create method must do following things:</p>
+
+<ul>
+<li>Check whether given params – userId and eventId are not null</li>
+<li>Check if there is already Reservation for given userId and event Id. This should happen with usage of ReservationRepository.</li>
+<li>Check if there is Event with given eventId in datastore. For this task, Reservation factory method should user EventRepository.</li>
+<li>Use Clock domain class to obtain current time.</li>
+</ul>
+
+<p>As we can see, Reservation create factory method needs 2 domain repositories and Clock domain service to perform it’s
+task. Not to mention about two required parameters – userId and eventId. That’s gives us five method parameters!
+Uncle Bob would be proud…</p>
+
+<p>But ok… let’s look at the ReservationService code with injected depencencies:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#a6e22e">@Service</span>
+<span style="color:#a6e22e">@Transactional</span>
+<span style="color:#a6e22e">@RequiredArgsConstructor</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ReservationService</span> <span style="color:#f92672">{</span>
+
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">final</span> ReservationRepository reservationRepository<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">final</span> EventRepository eventRepository<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">final</span> Clock clock<span style="color:#f92672">;</span>
+
+    <span style="color:#66d9ef">public</span> ReservationId <span style="color:#a6e22e">createReservation</span><span style="color:#f92672">(</span>UserId userId<span style="color:#f92672">,</span> EventId eventId<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        Reservation reservation <span style="color:#f92672">=</span> Reservation<span style="color:#f92672">.</span><span style="color:#a6e22e">create</span><span style="color:#f92672">(</span>userId<span style="color:#f92672">,</span> eventId<span style="color:#f92672">,</span> reservationRepository<span style="color:#f92672">,</span> eventRepository<span style="color:#f92672">,</span> clock<span style="color:#f92672">);</span>
+        reservationRepository<span style="color:#f92672">.</span><span style="color:#a6e22e">save</span><span style="color:#f92672">(</span>reservation<span style="color:#f92672">);</span>
+
+        <span style="color:#66d9ef">return</span> reservation<span style="color:#f92672">.</span><span style="color:#a6e22e">getId</span><span style="color:#f92672">();</span>
+    <span style="color:#f92672">}</span>
+
+<span style="color:#f92672">}</span></code></pre></div>
+<p>And create static factory method of Reservation aggregate:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#75715e">/**
+</span><span style="color:#75715e">     * Creates Reservation for user with given UserId and event with given EventId.
+</span><span style="color:#75715e">     * Reservation is valid for 10 minutes.
+</span><span style="color:#75715e">     * After that time will expire.
+</span><span style="color:#75715e">     */</span>
+    <span style="color:#66d9ef">static</span> Reservation <span style="color:#a6e22e">create</span><span style="color:#f92672">(</span>UserId userId<span style="color:#f92672">,</span> EventId eventId<span style="color:#f92672">,</span> ReservationRepository reservationRepository<span style="color:#f92672">,</span> EventRepository eventRepository<span style="color:#f92672">,</span> Clock clock<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        checkNotNull<span style="color:#f92672">(</span>userId<span style="color:#f92672">);</span>
+        checkNotNull<span style="color:#f92672">(</span>eventId<span style="color:#f92672">);</span>
+
+        reservationRepository
+                <span style="color:#f92672">.</span><span style="color:#a6e22e">findCurrentByUserIdAndEventId</span><span style="color:#f92672">(</span>userId<span style="color:#f92672">,</span> eventId<span style="color:#f92672">)</span>
+                <span style="color:#f92672">.</span><span style="color:#a6e22e">ifPresent</span><span style="color:#f92672">(</span>r <span style="color:#f92672">-&gt;</span> <span style="color:#f92672">{</span>
+                    <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> ReservationAlreadyExistException<span style="color:#f92672">();</span>
+                <span style="color:#f92672">});</span>
+
+        Event event <span style="color:#f92672">=</span> eventRepository
+                <span style="color:#f92672">.</span><span style="color:#a6e22e">findById</span><span style="color:#f92672">(</span>eventId<span style="color:#f92672">)</span>
+                <span style="color:#f92672">.</span><span style="color:#a6e22e">orElseThrow</span><span style="color:#f92672">(()</span> <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">new</span> IllegalArgumentException<span style="color:#f92672">(</span>format<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Event with given id %s not found&#34;</span><span style="color:#f92672">,</span> eventId<span style="color:#f92672">)));</span>
+
+        LocalDateTime started <span style="color:#f92672">=</span> clock<span style="color:#f92672">.</span><span style="color:#a6e22e">whatDateTimeIsIt</span><span style="color:#f92672">();</span>
+
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>started<span style="color:#f92672">.</span><span style="color:#a6e22e">isBefore</span><span style="color:#f92672">(</span>event<span style="color:#f92672">.</span><span style="color:#a6e22e">getSalesStartDate</span><span style="color:#f92672">())</span> <span style="color:#f92672">||</span> started<span style="color:#f92672">.</span><span style="color:#a6e22e">isAfter</span><span style="color:#f92672">(</span>event<span style="color:#f92672">.</span><span style="color:#a6e22e">getSalesEndDate</span><span style="color:#f92672">()))</span> <span style="color:#f92672">{</span>
+            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> UnableToCreateReservationForEventException<span style="color:#f92672">();</span>
+        <span style="color:#f92672">}</span>
+
+        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> Reservation<span style="color:#f92672">(</span>
+                ReservationId<span style="color:#f92672">.</span><span style="color:#a6e22e">generate</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getValue</span><span style="color:#f92672">(),</span>
+                userId<span style="color:#f92672">,</span>
+                eventId<span style="color:#f92672">,</span>
+                ReservationDateTimeInfo<span style="color:#f92672">.</span><span style="color:#a6e22e">from</span><span style="color:#f92672">(</span>started<span style="color:#f92672">,</span> event<span style="color:#f92672">.</span><span style="color:#a6e22e">getSalesEndDate</span><span style="color:#f92672">()),</span>
+                CURRENT
+        <span style="color:#f92672">);</span></code></pre></div>
+<h1 id="getting-rid-of-a-lot-of-params">Getting rid of a lot of params</h1>
+
+<p>If Reservations’ create method with required 5 params (3 dependencies) did not frighten you, just remember, that this creation process was not that complicated.
+There will be more complex processes which will require more and more dependencies to play with. So I imagine that there may be methods with 4-5 dependencies or more.
+Just think about unit testing that kind of things…</p>
+
+<p>Of course we could wrap all incoming parameters into one data transfer object, but for me this would add additional, not necessary noise in code.
+It would be look like this:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#a6e22e">@Service</span>
+<span style="color:#a6e22e">@Transactional</span>
+<span style="color:#a6e22e">@RequiredArgsConstructor</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ReservationService</span> <span style="color:#f92672">{</span>
+
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">final</span> ReservationRepository reservationRepository<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">final</span> EventRepository eventRepository<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">final</span> Clock clock<span style="color:#f92672">;</span>
+
+    <span style="color:#66d9ef">public</span> ReservationId <span style="color:#a6e22e">createReservation</span><span style="color:#f92672">(</span>UserId userId<span style="color:#f92672">,</span> EventId eventId<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        Reservation reservation <span style="color:#f92672">=</span> Reservation<span style="color:#f92672">.</span><span style="color:#a6e22e">create</span><span style="color:#f92672">(</span>
+                <span style="color:#66d9ef">new</span> ReservationCreationData<span style="color:#f92672">(</span>
+                        userId<span style="color:#f92672">,</span>
+                        eventId<span style="color:#f92672">,</span>
+                        reservationRepository<span style="color:#f92672">,</span>
+                        eventRepository<span style="color:#f92672">,</span>
+                        clock
+                <span style="color:#f92672">)</span>
+        <span style="color:#f92672">);</span>
+        reservationRepository<span style="color:#f92672">.</span><span style="color:#a6e22e">save</span><span style="color:#f92672">(</span>reservation<span style="color:#f92672">);</span>
+
+        <span style="color:#66d9ef">return</span> reservation<span style="color:#f92672">.</span><span style="color:#a6e22e">getId</span><span style="color:#f92672">();</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#a6e22e">@Value</span>
+    <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ReservationCreationData</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">final</span> UserId userId<span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">final</span> EventId eventId<span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">final</span> ReservationRepository reservationRepository<span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">final</span> EventRepository eventRepository<span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">final</span> Clock clock<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+
+<span style="color:#f92672">}</span></code></pre></div>
+<p>Reservation:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#75715e">/**
+</span><span style="color:#75715e"> * Creates Reservation for user with given UserId and event with given EventId.
+</span><span style="color:#75715e"> * Reservation is valid for 10 minutes.
+</span><span style="color:#75715e"> * After that time will expire.
+</span><span style="color:#75715e"> */</span>
+<span style="color:#66d9ef">static</span> Reservation <span style="color:#a6e22e">create</span><span style="color:#f92672">(</span>ReservationCreationData creationData<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    UserId userId <span style="color:#f92672">=</span> creationData<span style="color:#f92672">.</span><span style="color:#a6e22e">getUserId</span><span style="color:#f92672">();</span>
+    EventId eventId <span style="color:#f92672">=</span> creationData<span style="color:#f92672">.</span><span style="color:#a6e22e">getEventId</span><span style="color:#f92672">();</span>
+
+    checkNotNull<span style="color:#f92672">(</span>userId<span style="color:#f92672">);</span>
+    checkNotNull<span style="color:#f92672">(</span>eventId<span style="color:#f92672">);</span>
+
+    creationData<span style="color:#f92672">.</span><span style="color:#a6e22e">getReservationRepository</span><span style="color:#f92672">()</span>
+            <span style="color:#f92672">.</span><span style="color:#a6e22e">findCurrentByUserIdAndEventId</span><span style="color:#f92672">(</span>userId<span style="color:#f92672">,</span> eventId<span style="color:#f92672">)</span>
+            <span style="color:#f92672">.</span><span style="color:#a6e22e">ifPresent</span><span style="color:#f92672">(</span>r <span style="color:#f92672">-&gt;</span> <span style="color:#f92672">{</span>
+                <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> ReservationAlreadyExistException<span style="color:#f92672">();</span>
+            <span style="color:#f92672">});</span>
+
+    Event event <span style="color:#f92672">=</span> creationData<span style="color:#f92672">.</span><span style="color:#a6e22e">getEventRepository</span><span style="color:#f92672">()</span>
+            <span style="color:#f92672">.</span><span style="color:#a6e22e">findById</span><span style="color:#f92672">(</span>eventId<span style="color:#f92672">)</span>
+            <span style="color:#f92672">.</span><span style="color:#a6e22e">orElseThrow</span><span style="color:#f92672">(()</span> <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">new</span> IllegalArgumentException<span style="color:#f92672">(</span>format<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Event with given id %s not found&#34;</span><span style="color:#f92672">,</span> eventId<span style="color:#f92672">)));</span>
+
+    LocalDateTime started <span style="color:#f92672">=</span> creationData<span style="color:#f92672">.</span><span style="color:#a6e22e">getClock</span><span style="color:#f92672">().</span><span style="color:#a6e22e">whatDateTimeIsIt</span><span style="color:#f92672">();</span>
+
+    <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>started<span style="color:#f92672">.</span><span style="color:#a6e22e">isBefore</span><span style="color:#f92672">(</span>event<span style="color:#f92672">.</span><span style="color:#a6e22e">getSalesStartDate</span><span style="color:#f92672">())</span> <span style="color:#f92672">||</span> started<span style="color:#f92672">.</span><span style="color:#a6e22e">isAfter</span><span style="color:#f92672">(</span>event<span style="color:#f92672">.</span><span style="color:#a6e22e">getSalesEndDate</span><span style="color:#f92672">()))</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> UnableToCreateReservationForEventException<span style="color:#f92672">();</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> Reservation<span style="color:#f92672">(</span>
+            ReservationId<span style="color:#f92672">.</span><span style="color:#a6e22e">generate</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getValue</span><span style="color:#f92672">(),</span>
+            userId<span style="color:#f92672">,</span>
+            eventId<span style="color:#f92672">,</span>
+            ReservationDateTimeInfo<span style="color:#f92672">.</span><span style="color:#a6e22e">from</span><span style="color:#f92672">(</span>started<span style="color:#f92672">,</span> event<span style="color:#f92672">.</span><span style="color:#a6e22e">getSalesEndDate</span><span style="color:#f92672">()),</span>
+            CURRENT
+    <span style="color:#f92672">);</span>
+<span style="color:#f92672">}</span></code></pre></div>
+<p>This is better than 5 parameters approach. We have only one parameter now. But this generates some new inconvenience. For me this code is hard to read.</p>
+
+<p>Additionally it requires transport wrapping object for almost all nontrivial operations. Now we have one. What happens when our app will have one hundred of non trivial operations?</p>
+
+<h1 id="domainregistry-on-the-way">DomainRegistry on the way</h1>
+
+<p>For me DomainRegistry implementation from Mr Vernon code has some disadvantages.
+Firstly, it has static methods – which can be hard for unit testing and mocking.
+The second disadvantage is extending Spring ApplicationContextAware interface and interfere Spring core code with clean domain.</p>
+
+<p>Instead of creating class with static methods, domain has only knowledge of this interface:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">interface</span> <span style="color:#a6e22e">DomainRegistry</span> <span style="color:#f92672">{</span>
+
+    Clock <span style="color:#a6e22e">clock</span><span style="color:#f92672">();</span>
+
+    EventRepository <span style="color:#a6e22e">eventRepository</span><span style="color:#f92672">();</span>
+
+    ReservationRepository <span style="color:#a6e22e">reservationRepository</span><span style="color:#f92672">();</span>
+
+<span style="color:#f92672">}</span></code></pre></div>
+<p>Thanks to Dependency injection and Dependency inversion principle, Spring detailed implementation of this interface may
+lay far far away from clean Domain. In other words – Domain doesn’t know what is the algorithm for retrieving domain services.
+We are trying make Domain framework agnostic as much as can.</p>
+
+<p>DomainRegistry implementation lays in infrastructure scope (with package scope visibility):</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#a6e22e">@Component</span>
+<span style="color:#a6e22e">@RequiredArgsConstructor</span>
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">DomainRegistryImpl</span> <span style="color:#66d9ef">implements</span> ApplicationContextAware<span style="color:#f92672">,</span> DomainRegistry <span style="color:#f92672">{</span>
+
+    <span style="color:#66d9ef">private</span> ApplicationContext context<span style="color:#f92672">;</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setApplicationContext</span><span style="color:#f92672">(</span>ApplicationContext context<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">context</span> <span style="color:#f92672">=</span> context<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> Clock <span style="color:#a6e22e">clock</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">return</span> context<span style="color:#f92672">.</span><span style="color:#a6e22e">getBean</span><span style="color:#f92672">(</span>Clock<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> EventRepository <span style="color:#a6e22e">eventRepository</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">return</span> context<span style="color:#f92672">.</span><span style="color:#a6e22e">getBean</span><span style="color:#f92672">(</span>EventRepository<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> ReservationRepository <span style="color:#a6e22e">reservationRepository</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">return</span> context<span style="color:#f92672">.</span><span style="color:#a6e22e">getBean</span><span style="color:#f92672">(</span>ReservationRepository<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span></code></pre></div>
+<p>Let’s refactor ReservationService and inject only DomainRegistry:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#a6e22e">@Service</span>
+<span style="color:#a6e22e">@Transactional</span>
+<span style="color:#a6e22e">@RequiredArgsConstructor</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ReservationService</span> <span style="color:#f92672">{</span>
+
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">final</span> DomainRegistry domainRegistry<span style="color:#f92672">;</span>
+
+    <span style="color:#66d9ef">public</span> ReservationId <span style="color:#a6e22e">createReservation</span><span style="color:#f92672">(</span>UserId userId<span style="color:#f92672">,</span> EventId eventId<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        Reservation reservation <span style="color:#f92672">=</span> Reservation<span style="color:#f92672">.</span><span style="color:#a6e22e">create</span><span style="color:#f92672">(</span>userId<span style="color:#f92672">,</span> eventId<span style="color:#f92672">,</span> domainRegistry<span style="color:#f92672">);</span>
+        domainRegistry
+                    <span style="color:#f92672">.</span><span style="color:#a6e22e">reservationRepository</span><span style="color:#f92672">()</span>
+                    <span style="color:#f92672">.</span><span style="color:#a6e22e">save</span><span style="color:#f92672">(</span>reservation<span style="color:#f92672">);</span>
+
+        <span style="color:#66d9ef">return</span> reservation<span style="color:#f92672">.</span><span style="color:#a6e22e">getId</span><span style="color:#f92672">();</span>
+    <span style="color:#f92672">}</span>
+
+<span style="color:#f92672">}</span></code></pre></div>
+<p>And then Reservation create factory method. Not Factory method takes 3 params – two values and one dependency:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">static</span> Reservation <span style="color:#a6e22e">create</span><span style="color:#f92672">(</span>UserId userId<span style="color:#f92672">,</span> EventId eventId<span style="color:#f92672">,</span> DomainRegistry registry<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    checkNotNull<span style="color:#f92672">(</span>userId<span style="color:#f92672">);</span>
+    checkNotNull<span style="color:#f92672">(</span>eventId<span style="color:#f92672">);</span>
+
+    registry<span style="color:#f92672">.</span><span style="color:#a6e22e">reservationRepository</span><span style="color:#f92672">()</span>
+            <span style="color:#f92672">.</span><span style="color:#a6e22e">findCurrentByUserIdAndEventId</span><span style="color:#f92672">(</span>userId<span style="color:#f92672">,</span> eventId<span style="color:#f92672">)</span>
+            <span style="color:#f92672">.</span><span style="color:#a6e22e">ifPresent</span><span style="color:#f92672">(</span>r <span style="color:#f92672">-&gt;</span> <span style="color:#f92672">{</span>
+                <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> ReservationAlreadyExistException<span style="color:#f92672">();</span>
+            <span style="color:#f92672">});</span>
+
+    Event event <span style="color:#f92672">=</span> registry<span style="color:#f92672">.</span><span style="color:#a6e22e">eventRepository</span><span style="color:#f92672">()</span>
+            <span style="color:#f92672">.</span><span style="color:#a6e22e">findById</span><span style="color:#f92672">(</span>eventId<span style="color:#f92672">)</span>
+            <span style="color:#f92672">.</span><span style="color:#a6e22e">orElseThrow</span><span style="color:#f92672">(()</span> <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">new</span> IllegalArgumentException<span style="color:#f92672">(</span>format<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Event with given id %s not found&#34;</span><span style="color:#f92672">,</span> eventId<span style="color:#f92672">)));</span>
+
+    LocalDateTime started <span style="color:#f92672">=</span> registry<span style="color:#f92672">.</span><span style="color:#a6e22e">clock</span><span style="color:#f92672">().</span><span style="color:#a6e22e">whatDateTimeIsIt</span><span style="color:#f92672">();</span>
+
+    <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>started<span style="color:#f92672">.</span><span style="color:#a6e22e">isBefore</span><span style="color:#f92672">(</span>event<span style="color:#f92672">.</span><span style="color:#a6e22e">getSalesStartDate</span><span style="color:#f92672">())</span> <span style="color:#f92672">||</span> started<span style="color:#f92672">.</span><span style="color:#a6e22e">isAfter</span><span style="color:#f92672">(</span>event<span style="color:#f92672">.</span><span style="color:#a6e22e">getSalesEndDate</span><span style="color:#f92672">()))</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> UnableToCreateReservationForEventException<span style="color:#f92672">();</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> Reservation<span style="color:#f92672">(</span>
+            ReservationId<span style="color:#f92672">.</span><span style="color:#a6e22e">generate</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getValue</span><span style="color:#f92672">(),</span>
+            userId<span style="color:#f92672">,</span>
+            eventId<span style="color:#f92672">,</span>
+            ReservationDateTimeInfo<span style="color:#f92672">.</span><span style="color:#a6e22e">from</span><span style="color:#f92672">(</span>started<span style="color:#f92672">,</span> event<span style="color:#f92672">.</span><span style="color:#a6e22e">getSalesEndDate</span><span style="color:#f92672">()),</span>
+            CURRENT
+    <span style="color:#f92672">);</span>
+<span style="color:#f92672">}</span></code></pre></div>
+<p>For me this approach is the best so far. Of course someone may complain that when we pass DomainRegistry to method,
+we do not know which dependencies are being used and what is going under the hood. But… isn’t it a purpose
+of encapsulation?</p>
+
+<p>Method signatures should be verbose enough – they take DomainRegistry object, so they may use it.</p>
+
+<p>What is more – DomainRegistry should be registered per Bounded Context so other Bounded Contexts’ objects shouldn’t be
+able to use domain dependencies which don’t belong to them.</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>DomainRegistry is nice concept which can be used per Bounded Context.</p>
+
+<p>Advanced domain objects such Aggregates, Domain services or Factories can perform complex operations, which sometimes
+requires many dependencies. These dependencies can be injected on object creation (for Factories or Domain Services),
+or passed as method parameter (for Aggregates).</p>
+
+<p>DomainRegistry solve problem of passing too many parameters to domain object methods and prevent to make their contract
+huge and ugly.</p>
+
+<p>Of course, there are some minor issues of this approach. Because DomainRegistry provide many dependencies, they must
+be public (even when we want to make them hidden in package scope for example).</p>
+
+<p>But remember… there are no silver bullets.</p>
+
+    </div>
+  </article>
+
+    </main>
+  </body>
+</html>
