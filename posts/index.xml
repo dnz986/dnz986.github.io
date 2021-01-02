@@ -14,9 +14,8 @@
       
       <guid>https://dnz986.github.io/manjaro-i3-arch-linux/</guid>
       <description>By default Manjaro i3 has palemoon installed as the default browser. I&amp;rsquo;m not a big fan, and want to switch over to something that is closer to my heart, namely opera.
-Besides removing palemoon you still need to do the follwing:
-vim ~/.config/mimeapps.list To replace all the occurances of userapp-Pale Moon.desktop with opera.desktop you need to enter(first press Esc key and :)
-:%s/userapp-Pale Moon.desktop/opera.desktop/g Next edit the ~/.profile file and change the BROWSER environment variable to /usr/bin/opera.</description>
+These are the steps that you need to do:
+ Remove all entries from the ~/.config/mimeapps.list Update the .profile file  Update mimeapps vim ~/.config/mimeapps.list To replace all the occurances of userapp-Pale Moon.desktop with opera.desktop you need to enter(first press Esc key and :)</description>
     </item>
     
     <item>
