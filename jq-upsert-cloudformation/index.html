@@ -3,7 +3,7 @@
   <head>
     <title>JQ Upsert Cloudformation // dnz986 notes</title>
     <meta charset="utf-8" />
-    <meta name="generator" content="Hugo 0.54.0" />
+    <meta name="generator" content="Hugo 0.79.0" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="author" content="dnz986" />
     <meta name="description" content="" />
@@ -39,7 +39,6 @@
       <p>I&rsquo;ve been trying recently to automate some cloudformation scripts. The parameters that are supplied to cloudformation can be all from the command line
 or all within a file, but not both. Hence I went for changing the file using <code>jq</code>. If you want to change any json from the command line then <code>jq</code> will
 be your friend.</p>
-
 <p>A typical cloudformation json will look like this:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">[
   {
@@ -50,33 +49,30 @@ be your friend.</p>
     <span style="color:#f92672">&#34;ParameterKey&#34;</span>: <span style="color:#e6db74">&#34;InstanceType&#34;</span>,
     <span style="color:#f92672">&#34;ParameterValue&#34;</span>: <span style="color:#e6db74">&#34;m1.micro&#34;</span>
   }
-]</code></pre></div>
-<p>Being lazy i went ahead and searched for a already available solution. After some googling around I have found this
+]
+</code></pre></div><p>Being lazy i went ahead and searched for a already available solution. After some googling around I have found this
 <a href="http://engineering.monsanto.com/2015/05/22/jq-change-json/">link</a>, which looked very promising at first sight.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#66d9ef">function</span> populate-config<span style="color:#f92672">()</span> <span style="color:#f92672">{</span> 
   jq <span style="color:#e6db74">&#34;map(if .ParameterKey == \&#34;</span>$1<span style="color:#e6db74">\&#34; 
 </span><span style="color:#e6db74">          then . + {\&#34;ParameterValue\&#34;:\&#34;</span>$2<span style="color:#e6db74">\&#34;} 
 </span><span style="color:#e6db74">          else . 
 </span><span style="color:#e6db74">          end)&#34;</span>
-<span style="color:#f92672">}</span></code></pre></div>
-<p>I went ahead and fixed the quote escape on the $2 parameter in the above code and went on to test the function. Yay, it would overwrite
+<span style="color:#f92672">}</span>
+</code></pre></div><p>I went ahead and fixed the quote escape on the $2 parameter in the above code and went on to test the function. Yay, it would overwrite
 any existing value that was already defined in my json. Problem is, sometimes I would like to add some parameters which are not defined.</p>
-
 <p><code>jq</code> itself is quite complex, and me being a <code>jq</code> noob it took me a fair bit until I figured what the code did. It is looping over all the elements of the array
 and if the key matches the first supplied paramter then it will update the value of the &ldquo;ParameterValue&rdquo; with the second parameter.</p>
-
 <p>I wanted to have it in a single function, so this is what I came up with</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#66d9ef">function</span> upsert-config<span style="color:#f92672">()</span> <span style="color:#f92672">{</span> 
   jq <span style="color:#e6db74">&#34;del(.[]|select(.ParameterKey == \&#34;</span>$1<span style="color:#e6db74">\&#34;)) 
 </span><span style="color:#e6db74">      +[{\&#34;ParameterKey\&#34;: \&#34;</span>$1<span style="color:#e6db74">\&#34;,\&#34;ParameterValue\&#34;:\&#34;MyKey\&#34;}]&#34;</span>;
-<span style="color:#f92672">}</span></code></pre></div>
-<p>This is basically a delete and an insert. There is probably a better way to do this in <code>jq</code> but I do not know of any yet. This works for me now</p>
-
+<span style="color:#f92672">}</span>
+</code></pre></div><p>This is basically a delete and an insert. There is probably a better way to do this in <code>jq</code> but I do not know of any yet. This works for me now</p>
 <p>The nice thig about having this as a function is that you can update multiple variables using pipes in between:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-PowerShell" data-lang="PowerShell">cat config.json | 
    upsert-config Version 1.0.10|
-   upsert-config MinSize 0 &gt; result.json</code></pre></div>
-<p>Ok, now back to my cloudformation scripts.</p>
+   upsert-config MinSize 0 &gt; result.json
+</code></pre></div><p>Ok, now back to my cloudformation scripts.</p>
 
     </div>
     <div id="disqus_thread"></div>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on dnz986 notes</title>
@@ -6,10 +6,18 @@
     <description>Recent content in Posts on dnz986 notes</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 14 Feb 2019 23:00:00 +0200</lastBuildDate>
-    
-	<atom:link href="https://dnz986.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
-    
+    <lastBuildDate>Fri, 01 Jan 2021 00:00:00 +0200</lastBuildDate><atom:link href="https://dnz986.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Update default browser in manjaro i3 arch linux</title>
+      <link>https://dnz986.github.io/manjaro-i3-arch-linux/</link>
+      <pubDate>Fri, 01 Jan 2021 00:00:00 +0200</pubDate>
+      
+      <guid>https://dnz986.github.io/manjaro-i3-arch-linux/</guid>
+      <description>By default Manjaro i3 has palemoon installed as the default browser. I&amp;rsquo;m not a big fan, and want to switch over to something that is closer to my heart, namely opera.
+Besides removing palemoon you still need to do the follwing:
+vim ~/.config/mimeapps.list To replace all the occurances of userapp-Pale Moon.desktop with opera.desktop you need to enter(first press Esc key and :)
+:%s/userapp-Pale Moon.desktop/opera.desktop/g Next edit the ~/.profile file and change the BROWSER environment variable to /usr/bin/opera.</description>
+    </item>
     
     <item>
       <title>Clearing Up Domain Registry</title>
