@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Reset Unify Controller password // dnz986 notes</title>
+    <meta charset="utf-8" />
+    <meta name="generator" content="Hugo 0.80.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="dnz986" />
+    <meta name="description" content="" />
+    <base href="https://dnz986.github.io/" />
+    <link rel="stylesheet" href="https://dnz986.github.io/css/main.min.69eaa2ea72f096e96a4354a3affeb6587332ca518f7fa7cd3de60f6dbb548d57.css" />
+    <link rel="stylesheet" href="/static/css/style.css">
+  </head>
+  <body>
+    <header class="app-header">
+      <a href="/"><img class="app-header-avatar" src="./avatar.jpg" /></a>
+      <h1>dnz986 notes</h1>
+      <p>by night software developer, by day...also software developer</p>
+      <div class="app-header-social">
+        
+      </div>
+    </header>
+    <main class="app-container">
+      
+  <article class="post">
+    <header class="post-header">
+      <h1 class ="post-title">Reset Unify Controller password</h1>
+      <div class="post-meta">
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          Feb 17, 2021
+        </div>
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-clock"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          1 min read
+        </div></div>
+    </header>
+    <div class="post-content">
+      <p>I&rsquo;m running unify controller inside a docker container, and unfortunately needed to reset my password, as I have lost it.</p>
+<p>In order to reset it you need to do the following:</p>
+<ol>
+<li>SSH into the docker container</li>
+<li>Download mongo shell client: <code>wget https://downloads.mongodb.com/compass/mongosh-0.7.7-linux.tgz</code></li>
+<li>Unpack the archive: <code>tar -xvf mongosh-0.7.7-linux.tgz</code></li>
+<li>Connect to the mongodb instance: <code>./bin/mongosh --port 27117</code></li>
+<li>Switch to the relevant database: <code>use ace;</code></li>
+<li>Find the current admin user: <code>db.admin.find().forEach(printjson);</code></li>
+</ol>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;</span> db<span style="color:#f92672">.</span>admin<span style="color:#f92672">.</span>find()<span style="color:#f92672">.</span>forEach(printjson);
+</code></pre></div><pre><code>{
+  _id: ObjectId(&quot;aaaaaaaaaaaaaabbbbbbbb&quot;),
+  email: 'XXX',
+  last_site_name: 'default',
+  name: 'my_admin',
+  time_created: 1612538043,
+  ui_settings: {
+    dashboardConfig: { lastActiveDashboardId: '601d601a46e0fb011dd34716' }
+  },
+  x_shadow: '$6$9Ter1EZ9$e9UmBSNaGOaabUU0pXyqz8HNDV9pet6s.QkNdmpVSlLqf1pFh5jE67dcH7o8zupq7G95/XEbPA0dwy20C2.RR.'
+}
+</code></pre><ol start="7">
+<li>Generate a new hash using python</li>
+</ol>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> crypt
+<span style="color:#66d9ef">print</span>(crypt<span style="color:#f92672">.</span>crypt(<span style="color:#e6db74">&#34;password&#34;</span>, <span style="color:#e6db74">&#34;$6$9Ter1EZ9$lSt6$&#34;</span>))
+</code></pre></div><p>Note that the hash is the same on the start of x_shadow as well as what we are using to encrypt &lsquo;$6$9Ter1EZ9$lSt6$&rsquo;.</p>
+<ol start="8">
+<li>Update the admin User:</li>
+</ol>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">db<span style="color:#f92672">.</span>admin<span style="color:#f92672">.</span>update( { name: <span style="color:#960050;background-color:#1e0010">“</span>my_admin<span style="color:#960050;background-color:#1e0010">”</span> }, {<span style="color:#960050;background-color:#1e0010">$</span>set: { x_shadow: <span style="color:#960050;background-color:#1e0010">“</span>YourNewHash<span style="color:#960050;background-color:#1e0010">”</span> } } );
+</code></pre></div><p>Make sure to replace my_admin and YourNewHash with what you got back from querying for the user respectively encrypting
+your new password</p>
+<p>Done.</p>
+
+    </div>
+    <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "dnz986" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+  </article>
+
+    </main>
+  </body>
+</html>

@@ -3,7 +3,7 @@
   <head>
     <title>dnz986 notes</title>
     <meta charset="utf-8" />
-    <meta name="generator" content="Hugo 0.79.0" />
+    <meta name="generator" content="Hugo 0.80.0" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="author" content="dnz986" />
     <meta name="description" content="by night software developer, by day...also software developer" />
@@ -24,6 +24,21 @@
       
 <article>
     <ul class="posts-list">
+        
+        <li class="posts-list-item">
+            <a class="posts-list-item-title" href="https://dnz986.github.io/reset-unify-controller-password/">Reset Unify Controller password</a>
+            <span class="posts-list-item-description">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-clock"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> 1 min read -
+            Feb 17, 2021
+          </span>
+            <span class="posts-list-item-summary">
+            I’m running unify controller inside a docker container, and unfortunately needed to reset my password, as I have lost it. In order to reset it you need to do the following: SSH into the docker container Download mongo shell client: wget https://downloads.mongodb.com/compass/mongosh-0.7.7-linux.tgz Unpack the archive: tar -xvf mongosh-0.7.7-linux.tgz Connect to the mongodb instance: ./bin/mongosh --port 27117 Switch to the relevant database: use ace; Find the current admin user: db.admin.find().forEach(printjson); &gt; db.
+            
+                <a href="https://dnz986.github.io/reset-unify-controller-password/">read more</a>
+            
+          </span>
+            <br>
+        </li>
         
         <li class="posts-list-item">
             <a class="posts-list-item-title" href="https://dnz986.github.io/manjaro-i3-arch-linux/">Update default browser in manjaro i3 arch linux</a>

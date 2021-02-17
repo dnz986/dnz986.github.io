@@ -6,7 +6,18 @@
     <description>Recent content on dnz986 notes</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 01 Jan 2021 00:00:00 +0200</lastBuildDate><atom:link href="https://dnz986.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 17 Feb 2021 00:00:00 +0200</lastBuildDate><atom:link href="https://dnz986.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Reset Unify Controller password</title>
+      <link>https://dnz986.github.io/reset-unify-controller-password/</link>
+      <pubDate>Wed, 17 Feb 2021 00:00:00 +0200</pubDate>
+      
+      <guid>https://dnz986.github.io/reset-unify-controller-password/</guid>
+      <description>I&amp;rsquo;m running unify controller inside a docker container, and unfortunately needed to reset my password, as I have lost it.
+In order to reset it you need to do the following:
+ SSH into the docker container Download mongo shell client: wget https://downloads.mongodb.com/compass/mongosh-0.7.7-linux.tgz Unpack the archive: tar -xvf mongosh-0.7.7-linux.tgz Connect to the mongodb instance: ./bin/mongosh --port 27117 Switch to the relevant database: use ace; Find the current admin user: db.admin.find().forEach(printjson);  &amp;gt; db.</description>
+    </item>
+    
     <item>
       <title>Update default browser in manjaro i3 arch linux</title>
       <link>https://dnz986.github.io/manjaro-i3-arch-linux/</link>
